@@ -1,14 +1,15 @@
-import debugpy
 import os
 import sys
 import subprocess
 from typing import List
 
-# 监听所有IP的23787端口
-debugpy.listen(("0.0.0.0", 23787))
-print("⏳ 等待调试器连接...（VS Code attach前会卡在这）")
-debugpy.wait_for_client()
-debugpy.breakpoint()  # 可选，自动在这里断下
+# if want to remote debug: uncomment the following lines
+# import debugpy
+# # listen on all IP for 23787port
+# debugpy.listen(("0.0.0.0", 23787))
+# print("⏳ 等待调试器连接...（VS Code attach前会卡在这）")
+# debugpy.wait_for_client()
+# debugpy.breakpoint()  # make vscode debugging stop here automatically
 
 
 class ProcessInfo:
@@ -135,19 +136,24 @@ def main():
         print("Not Found")
     else:
         for proc in matched:
-            print(f"User: {proc.USER}")
+            # print with blue color
+            print(f"User: \033[34m{proc.USER}\033[0m")
             print(f"Process PID: {proc.PID}")
-            print(f"JRE Actual Path: {proc.REAL_JAVA_PATH}")
+            # print with pink color
+            print(f"JRE Actual Path: \033[35m{proc.REAL_JAVA_PATH}\033[0m")
             print(f"ps -ef Info: {proc.FULLLINE}")
             print("-" * 80)
 
     # now print the summary of the processes which is not absolute path
-    print("\n\n\033[33mThe processes that are not absolute path:\033[0m\n")
+    print(
+        "\n\n\033[33mThe processes that are not absolute path (if has any output must check with the user as the relative path can't be evaluated):\033[0m\n"
+    )
     for proc in java_procs:
         if not proc.RELARIVE_PATH:
             # this is an absolute path, so we skip it
             continue
-        print(f"User: {proc.USER}")
+        # print with red color
+        print(f"User: \033[34m{proc.USER}\033[0m")
         print(f"Process PID: {proc.PID}")
         print(f"JRE Actual Path: {proc.REAL_JAVA_PATH}")
         print(f"ps -ef Info: {proc.FULLLINE}")
