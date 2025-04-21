@@ -7,7 +7,7 @@ from typing import List
 # import debugpy
 # # listen on all IP for 23787port
 # debugpy.listen(("0.0.0.0", 23787))
-# print("⏳ 等待调试器连接...（VS Code attach前会卡在这）")
+# print("waiting for debugger connected...（VS Code attach will break here）")
 # debugpy.wait_for_client()
 # debugpy.breakpoint()  # make vscode debugging stop here automatically
 
@@ -31,19 +31,19 @@ class ProcessInfo:
 
 
 def get_real_path(path):
-    """等价于 `readlink -f`，获取路径最终真实路径无论是相对路径，还是软连接还是绝对路径"""
+    """identical to the bash command `readlink -f`，works on multi level soft linke, absolute path, relative path...."""
     return os.path.realpath(path)
 
 
 def get_all_processes() -> List[ProcessInfo]:
-    """获取ps -ef的全部内容"""
+    """calling ps -ef and get the result"""
     result = subprocess.run(
         ["ps", "-ef"], stdout=subprocess.PIPE, universal_newlines=True, check=True
     )
     lines = result.stdout.strip().split("\n")
     processes: List[ProcessInfo] = []
     for line in lines[1:]:
-        # ps -ef 默认输出格式：UID PID PPID C STIME TTY TIME CMD
+        # ps -ef output：UID PID PPID C STIME TTY TIME CMD
         parts = line.split(None, 7)
         if len(parts) < 8:
             # the split expect to have 8 parts, but now it is less than 8, let's print the warning in red color
@@ -67,7 +67,7 @@ def get_all_processes() -> List[ProcessInfo]:
 
 
 def find_java_processes(processes: List[ProcessInfo]) -> List[ProcessInfo]:
-    """返回所有java进程，附带JRE绝对路径"""
+    """return all java processes with the absolute path of JRE"""
     java_procs: List[ProcessInfo] = []
     for proc in processes:
         cmd = (
